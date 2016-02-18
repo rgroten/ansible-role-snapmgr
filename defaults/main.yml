@@ -1,0 +1,11 @@
+---
+git_checkout_path: "/tmp/.snapmgr/files/src"
+local_snapmgr_path: "{{ git_checkout_path }}/snapmgr"
+docker_snapmgr_path: "/src/snapmgr"
+
+envs:
+  DEV:
+    na_host: localhost
+    user: admin
+    password: admin
+    debug: True

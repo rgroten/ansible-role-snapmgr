@@ -1,0 +1,28 @@
+[DEFAULT]
+VolFilters: rootvol,ignorethisvol
+Debug: True
+AuthRequired: False
+LdapServer: ldaps://ldapserver.example.com
+BaseUserDn: cn=users,dc=example,dc=com
+TLSCACertFile:
+RFCRequired: False
+LogFile: {{ snapmgr_log_file }}
+
+[GENERAL]
+Environments: {% for env in envs %}{{ env }},{% endfor %}
+
+[RFCDBCONN]
+Server: rfcdbserver.example.com
+Port: 1433
+DB: rfc_prod_db
+User:  rfc_ro_user
+Password: rfc_ro_user_pass
+Driver: PostgreSQL
+
+{% for env in envs %}
+[{{ env }}]
+NaHost: {{ envs[env].na_host }}
+User: {{ envs[env].user }}
+Password: {{ envs[env].password }}
+{% if env.debug is defined %}Debug: {{ envs[env].debug }}{% endif %}
+{% endfor %}

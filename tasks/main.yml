@@ -1,0 +1,64 @@
+---
+#- name: Add variables
+#include_vars: "{{ ansible_fqdn }}.yml"
+#tags:
+#- always
+
+- name: Install git
+  yum:
+    name: git
+    state: present
+  become: yes
+
+- name: Checkout snapmgr project from git
+  git:
+    repo: https://github.com/rgroten/NetApp-Snapshot-Manager
+    dest: "{{ git_checkout_path }}"
+    force: yes
+
+- name: Copy config.ini template
+  template:
+    src: config.ini.j2 
+    dest: "{{ local_snapmgr_path }}/config.ini"
+  tags: config.ini
+
+- name: Copy NetApp Libraries
+  copy:
+    src: "{{ item }}"
+    dest: "{{ local_snapmgr_path }}"
+  with_items:
+    - NaErrno.py
+    - NaElement.py
+    - NaServer.py
+
+- name: Copy JS dependencies
+  copy:
+    src: "{{ item }}"
+    dest: "{{ local_snapmgr_path }}/static/js"
+  with_items:
+        - ngProgress.min.js
+        - xml2json.min.js
+
+- name: Copy CSS dependencies
+  copy:
+    src: ngProgress.css
+    dest: "{{ local_snapmgr_path }}/static/css"
+
+- name: Set static path to config.ini required by wsgi
+  replace:
+    dest: "{{ local_snapmgr_path }}/NaFunctions.py"
+    regexp: '".*config.ini'
+    replace: '"{{ docker_snapmgr_path }}/config.ini'
+
+- name: Build snapmgr container
+  docker_image:
+    path: "{{ git_checkout_path }}"
+    name: "rgroten/snapmgr"
+    state: build
+
+- name: Run docker container
+  docker:
+    name: snapmgr
+    image: rgroten/snapmgr
+    state: reloaded
+    ports: 80:80
