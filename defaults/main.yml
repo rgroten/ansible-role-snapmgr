@@ -2,6 +2,7 @@
 git_checkout_path: "/tmp/.snapmgr/files/src"
 local_snapmgr_path: "{{ git_checkout_path }}/snapmgr"
 docker_snapmgr_path: "/src/snapmgr"
+snapmgr_log_file: "{{ docker_snapmgr_path }}/snapmgr.log"
 
 envs:
   DEV:

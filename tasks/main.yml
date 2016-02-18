@@ -1,8 +1,8 @@
 ---
-#- name: Add variables
-#include_vars: "{{ ansible_fqdn }}.yml"
-#tags:
-#- always
+- name: Add variables
+  include_vars: "{{ ansible_fqdn }}.yml"
+  tags:
+    - always
 
 - name: Install git
   yum:
